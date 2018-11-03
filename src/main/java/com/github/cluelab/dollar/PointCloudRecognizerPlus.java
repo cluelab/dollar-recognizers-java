@@ -1,4 +1,12 @@
-﻿/**
+/**
+ * The $ gesture recognizers (Java version)
+ *
+ * Copyright (c) 2018, Mattia De Rosa. All rights reserved.
+ *
+ * based on the $Q Super-Quick Recognizer (C# version) found at
+ * http://depts.washington.edu/madlab/proj/dollar/qdollar.html
+ * whose original header follows:
+ *
  * The $P+ Point-Cloud Recognizer (.NET Framework C# version)
  *
  * 	    Radu-Daniel Vatavu, Ph.D.
@@ -39,28 +47,28 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-using System;
 
-namespace PDollarGestureRecognizer
-{
-    /// <summary>
-    /// Implements the $P+ recognizer
-    /// </summary>
+package com.github.cluelab.dollar;
+
+    /**
+     * Implements the $P+ recognizer
+     */
     public class PointCloudRecognizerPlus
     {
-        /// <summary>
-        /// Main function of the $P+ recognizer.
-        /// Classifies a candidate gesture against a set of training samples.
-        /// Returns the class of the closest neighbor in the template set.
-        /// </summary>
-        /// <param name="candidate"></param>
-        /// <param name="trainingSet"></param>
-        /// <returns></returns>
-        public static string Classify(Gesture candidate, Gesture[] trainingSet)
+        /**
+         * Main function of the $P+ recognizer.
+         * Classifies a candidate gesture against a set of training samples.
+         * Returns the class of the closest neighbor in the template set.
+         *
+         * @param candidate
+         * @param trainingSet
+         * @return
+         */
+        public static String Classify(Gesture candidate, Gesture[] trainingSet)
         {
-            float minDistance = float.MaxValue;
-            string gestureClass = "";
-            foreach (Gesture template in trainingSet)
+            float minDistance = Float.MAX_VALUE;
+            String gestureClass = "";
+            for (Gesture template : trainingSet)
             {
                 float dist = GreedyCloudMatch(candidate.Points, template.Points);
                 if (dist < minDistance)
@@ -72,73 +80,73 @@ namespace PDollarGestureRecognizer
             return gestureClass;
         }
 
-        /// <summary>
-        /// Implements greedy search for a minimum-distance matching between two point clouds
-        /// using local shape descriptors (theta turning angles).
-        /// </summary>
+        /**
+         * Implements greedy search for a minimum-distance matching between two point clouds
+         * using local shape descriptors (theta turning angles).
+         */
         private static float GreedyCloudMatch(Point[] points1, Point[] points2)
         {
             float[] theta1 = ComputeLocalShapeDescriptors(points1);    // should be pre-processed in the Gesture class
             float[] theta2 = ComputeLocalShapeDescriptors(points2);    // should be pre-processed in the Gesture class
-            return Math.Min(
+            return Math.min(
                 CloudDistance(points1, theta1, points2, theta2), 
                 CloudDistance(points2, theta2, points1, theta1)
             );
         }
 
-        /// <summary>
-        /// Computes the distance between two point clouds 
-        /// using local shape descriptors (theta turning angles).
-        /// </summary>
+        /**
+         * Computes the distance between two point clouds 
+         * using local shape descriptors (theta turning angles).
+         */
         private static float CloudDistance(Point[] points1, float[] theta1, Point[] points2, float[] theta2)
         {
-            bool[] matched = new bool[points2.Length];
-            Array.Clear(matched, 0, points2.Length);
+            boolean[] matched = new boolean[points2.length];
+            //java.util.Arrays.fill(matched, 0, points2.length, false);
 
             float sum = 0; // computes the cost of the cloud alignment
-            int index;
+            int[] index = new int[1];
 
             // match points1 to points2
-            for (int i = 0; i < points1.Length; i++)
+            for (int i = 0; i < points1.length; i++)
             {
-                sum += GetClosestPointFromCloud(points1[i], theta1[i], points2, theta2, out index);
-                matched[index] = true;
+                sum += GetClosestPointFromCloud(points1[i], theta1[i], points2, theta2, index);
+                matched[index[0]] = true;
             }
 
             // match points2 to points1
-            for (int i = 0; i < points2.Length; i++)
+            for (int i = 0; i < points2.length; i++)
                 if (!matched[i])
-                    sum += GetClosestPointFromCloud(points2[i], theta2[i], points1, theta1, out index);
+                    sum += GetClosestPointFromCloud(points2[i], theta2[i], points1, theta1, index);
 
             return sum;
         }
 
 
-        /// <summary>
-        /// Searches for the point from point-cloud cloud that is closest to point p.
-        /// </summary>
-        private static float GetClosestPointFromCloud(Point p, float theta, Point[] cloud, float[] thetaCloud, out int indexMin)
+        /**
+         * Searches for the point from point-cloud cloud that is closest to point p.
+         */
+        private static float GetClosestPointFromCloud(Point p, float theta, Point[] cloud, float[] thetaCloud, int[] indexMin)
         {
-            float min = float.MaxValue;
-            indexMin = -1;
-            for (int i = 0; i < cloud.Length; i++)
+            float min = Float.MAX_VALUE;
+            indexMin[0] = -1;
+            for (int i = 0; i < cloud.length; i++)
             {
-                float dist = (float)Math.Sqrt(Geometry.SqrEuclideanDistance(p, cloud[i]) + (theta - thetaCloud[i]) * (theta - thetaCloud[i]));
+                float dist = (float)Math.sqrt(Geometry.SqrEuclideanDistance(p, cloud[i]) + (theta - thetaCloud[i]) * (theta - thetaCloud[i]));
                 if (dist < min)
                 {
                     min = dist;
-                    indexMin = i;
+                    indexMin[0] = i;
                 }
             }
             return min;
         }
 
-        /// <summary>
-        /// Computes local shape descriptors (theta turning angles) at each point on the gesture path.
-        /// </summary>
+        /**
+         * Computes local shape descriptors (theta turning angles) at each point on the gesture path.
+         */
         public static float[] ComputeLocalShapeDescriptors(Point[] points)
         {
-            int n = points.Length;
+            int n = points.length;
             float[] theta = new float[n];
 
             theta[0] = theta[n - 1] = 0;
@@ -147,15 +155,15 @@ namespace PDollarGestureRecognizer
             return theta;
         }
 
-        /// <summary>
-        /// Computes the smallest turning angle between vectors (a,b) and (b,c) in radians in the interval [0..PI].
-		/// </summary>
+        /**
+         * Computes the smallest turning angle between vectors (a,b) and (b,c) in radians in the interval [0..PI].
+         */
         public static float ShortAngle(Point a, Point b, Point c)
         {
             // compute path lengths for vectors (a,b) and (b,c)
             float length_ab = Geometry.EuclideanDistance(a, b);
             float length_bc = Geometry.EuclideanDistance(b, c);
-            if (Math.Abs(length_ab * length_bc) <= float.Epsilon)
+            if (Math.abs(length_ab * length_bc) <= Float.MIN_VALUE)
                 return 0;
 
             // compute cosine of the angle between vectors (a,b) and (b,c)
@@ -166,7 +174,6 @@ namespace PDollarGestureRecognizer
             if (cos_angle >= 1.0) return 0.0f;
 
             // return the angle between vectors (a,b) and (b,c) in the interval [0,PI]
-            return (float)Math.Acos(cos_angle);
+            return (float)Math.acos(cos_angle);
         }
     }
-}

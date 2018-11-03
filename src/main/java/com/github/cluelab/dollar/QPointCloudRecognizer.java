@@ -1,4 +1,12 @@
-﻿/**
+/**
+ * The $ gesture recognizers (Java version)
+ *
+ * Copyright (c) 2018, Mattia De Rosa. All rights reserved.
+ *
+ * based on the $Q Super-Quick Recognizer (C# version) found at
+ * http://depts.washington.edu/madlab/proj/dollar/qdollar.html
+ * whose original header follows:
+ *
  * The $Q Point-Cloud Recognizer (.NET Framework C# version)
  *
  * 	    Radu-Daniel Vatavu, Ph.D.
@@ -57,34 +65,33 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
 **/
-using System;
-using PDollarGestureRecognizer;
 
-namespace QDollarGestureRecognizer
-{
-    /// <summary>
-    /// Implements the $Q recognizer
-    /// </summary>
+package com.github.cluelab.dollar;
+
+    /**
+     * Implements the $Q recognizer
+     */
     public class QPointCloudRecognizer
     {
         // $Q's two major optimization layers (Early Abandoning and Lower Bounding)
         // can be activated / deactivated as desired
-        public static bool UseEarlyAbandoning = true;
-        public static bool UseLowerBounding = true;
+        public static boolean UseEarlyAbandoning = true;
+        public static boolean UseLowerBounding = true;
 
-        /// <summary>
-        /// Main function of the $Q recognizer.
-        /// Classifies a candidate gesture against a set of templates.
-        /// Returns the class of the closest neighbor in the template set.
-        /// </summary>
-        /// <param name="candidate"></param>
-        /// <param name="templateSet"></param>
-        /// <returns></returns>
-        public static string Classify(Gesture candidate, Gesture[] templateSet)
+        /**
+         * Main function of the $Q recognizer.
+         * Classifies a candidate gesture against a set of templates.
+         * Returns the class of the closest neighbor in the template set.
+         *
+         * @param candidate
+         * @param templateSet
+         * @return
+         */
+        public static String Classify(Gesture candidate, Gesture[] templateSet)
         {
-            float minDistance = float.MaxValue;
-            string gestureClass = "";
-            foreach (Gesture template in templateSet)
+            float minDistance = Float.MAX_VALUE;
+            String gestureClass = "";
+            for (Gesture template : templateSet)
             {
                 float dist = GreedyCloudMatch(candidate, template, minDistance);
                 if (dist < minDistance)
@@ -96,15 +103,15 @@ namespace QDollarGestureRecognizer
             return gestureClass;
         }
 
-        /// <summary>
-        /// Implements greedy search for a minimum-distance matching between two point clouds.
-        /// Implements Early Abandoning and Lower Bounding (LUT) optimizations.
-        /// </summary>
+        /**
+         * Implements greedy search for a minimum-distance matching between two point clouds.
+         * Implements Early Abandoning and Lower Bounding (LUT) optimizations.
+         */
         private static float GreedyCloudMatch(Gesture gesture1, Gesture gesture2, float minSoFar)
         {
-            int n = gesture1.Points.Length;       // the two clouds should have the same number of points by now
+            int n = gesture1.Points.length;       // the two clouds should have the same number of points by now
             float eps = 0.5f;                     // controls the number of greedy search trials (eps is in [0..1])
-            int step = (int)Math.Floor(Math.Pow(n, 1.0f - eps));
+            int step = (int)Math.floor(Math.pow(n, 1.0f - eps));
 
             if (UseLowerBounding)
             {
@@ -112,28 +119,28 @@ namespace QDollarGestureRecognizer
                 float[] LB2 = ComputeLowerBound(gesture2.Points, gesture1.Points, gesture1.LUT, step);  // direction of matching: gesture2 --> gesture1
                 for (int i = 0, indexLB = 0; i < n; i += step, indexLB++)
                 {
-                    if (LB1[indexLB] < minSoFar) minSoFar = Math.Min(minSoFar, CloudDistance(gesture1.Points, gesture2.Points, i, minSoFar));  // direction of matching: gesture1 --> gesture2 starting with index point i
-                    if (LB2[indexLB] < minSoFar) minSoFar = Math.Min(minSoFar, CloudDistance(gesture2.Points, gesture1.Points, i, minSoFar));  // direction of matching: gesture2 --> gesture1 starting with index point i   
+                    if (LB1[indexLB] < minSoFar) minSoFar = Math.min(minSoFar, CloudDistance(gesture1.Points, gesture2.Points, i, minSoFar));  // direction of matching: gesture1 --> gesture2 starting with index point i
+                    if (LB2[indexLB] < minSoFar) minSoFar = Math.min(minSoFar, CloudDistance(gesture2.Points, gesture1.Points, i, minSoFar));  // direction of matching: gesture2 --> gesture1 starting with index point i   
                 }
             }
             else
             {
                 for (int i = 0; i < n; i += step)
                 {
-                    minSoFar = Math.Min(minSoFar, CloudDistance(gesture1.Points, gesture2.Points, i, minSoFar));  // direction of matching: gesture1 --> gesture2 starting with index point i
-                    minSoFar = Math.Min(minSoFar, CloudDistance(gesture2.Points, gesture1.Points, i, minSoFar));  // direction of matching: gesture2 --> gesture1 starting with index point i   
+                    minSoFar = Math.min(minSoFar, CloudDistance(gesture1.Points, gesture2.Points, i, minSoFar));  // direction of matching: gesture1 --> gesture2 starting with index point i
+                    minSoFar = Math.min(minSoFar, CloudDistance(gesture2.Points, gesture1.Points, i, minSoFar));  // direction of matching: gesture2 --> gesture1 starting with index point i   
                 }
             }
 
             return minSoFar;
         }
 
-        /// <summary>
-        /// Computes lower bounds for each starting point and the direction of matching from points1 to points2 
-        /// </summary>
+        /**
+         * Computes lower bounds for each starting point and the direction of matching from points1 to points2 
+         */
         private static float[] ComputeLowerBound(Point[] points1, Point[] points2, int[][] LUT, int step)
         {
-            int n = points1.Length;
+            int n = points1.length;
             float[] LB = new float[n / step + 1];
             float[] SAT = new float[n];
 
@@ -151,17 +158,18 @@ namespace QDollarGestureRecognizer
             return LB;
         }
 
-        /// <summary>
-        /// Computes the distance between two point clouds by performing a minimum-distance greedy matching
-        /// starting with point startIndex
-        /// </summary>
-        /// <param name="points1"></param>
-        /// <param name="points2"></param>
-        /// <param name="startIndex"></param>
-        /// <returns></returns>
+        /**
+         * Computes the distance between two point clouds by performing a minimum-distance greedy matching
+         * starting with point startIndex
+         *
+         * @param points1
+         * @param points2
+         * @param startIndex
+         * @return
+         */
         private static float CloudDistance(Point[] points1, Point[] points2, int startIndex, float minSoFar)
         {
-            int n = points1.Length;                // the two point clouds should have the same number of points by now
+            int n = points1.length;                // the two point clouds should have the same number of points by now
             int[] indexesNotMatched = new int[n];  // stores point indexes for points from the 2nd cloud that haven't been matched yet
             for (int j = 0; j < n; j++)
                 indexesNotMatched[j] = j;
@@ -173,7 +181,7 @@ namespace QDollarGestureRecognizer
             do
             {
                 int index = -1;
-                float minDistance = float.MaxValue;
+                float minDistance = Float.MAX_VALUE;
                 for (int j = indexNotMatched; j < n; j++)
                 {
                     float dist = Geometry.SqrEuclideanDistance(points1[i], points2[indexesNotMatched[j]]);  // use the squared Euclidean distance
@@ -198,4 +206,3 @@ namespace QDollarGestureRecognizer
             return sum;
         }
     }
-}

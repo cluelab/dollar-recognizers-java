@@ -1,4 +1,12 @@
 /**
+ * The $ gesture recognizers (Java version)
+ *
+ * Copyright (c) 2018, Mattia De Rosa. All rights reserved.
+ *
+ * based on the $Q Super-Quick Recognizer (C# version) found at
+ * http://depts.washington.edu/madlab/proj/dollar/qdollar.html
+ * whose original header follows:
+ *
  * The $P Point-Cloud Recognizer (.NET Framework C# version)
  *
  * 	    Radu-Daniel Vatavu, Ph.D.
@@ -57,14 +65,13 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
 **/
-using System;
 
-namespace PDollarGestureRecognizer
-{
-    /// <summary>
-    /// Implements a 2D Point that exposes X, Y, and StrokeID properties.
-    /// StrokeID is the stroke index the point belongs to (e.g., 0, 1, 2, ...) that is filled by counting pen down/up events.
-    /// </summary>
+package com.github.cluelab.dollar;
+
+    /**
+     * Implements a 2D Point that exposes X, Y, and StrokeID properties.
+     * StrokeID is the stroke index the point belongs to (e.g., 0, 1, 2, ...) that is filled by counting pen down/up events.
+     */
     public class Point
     {
         public float X, Y;       // point coordinates
@@ -80,4 +87,3 @@ namespace PDollarGestureRecognizer
             this.intY = 0;
         }
     }
-}

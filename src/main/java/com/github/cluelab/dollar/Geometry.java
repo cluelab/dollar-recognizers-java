@@ -1,4 +1,12 @@
 /**
+ * The $ gesture recognizers (Java version)
+ *
+ * Copyright (c) 2018, Mattia De Rosa. All rights reserved.
+ *
+ * based on the $Q Super-Quick Recognizer (C# version) found at
+ * http://depts.washington.edu/madlab/proj/dollar/qdollar.html
+ * whose original header follows:
+ *
  * The $P Point-Cloud Recognizer (.NET Framework C# version)
  *
  * 	    Radu-Daniel Vatavu, Ph.D.
@@ -57,26 +65,24 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
 **/
-using System;
 
-namespace PDollarGestureRecognizer
-{
+package com.github.cluelab.dollar;
+
     public class Geometry
     {
-        /// <summary>
-        /// Computes the Squared Euclidean Distance between two points in 2D
-        /// </summary>
+        /**
+         * Computes the Squared Euclidean Distance between two points in 2D
+         */
         public static float SqrEuclideanDistance(Point a, Point b)
         {
             return (a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y);
         }
 
-        /// <summary>
-        /// Computes the Euclidean Distance between two points in 2D
-        /// </summary>
+        /**
+         * Computes the Euclidean Distance between two points in 2D
+         */
         public static float EuclideanDistance(Point a, Point b)
         {
-            return (float)Math.Sqrt(SqrEuclideanDistance(a, b));
+            return (float)Math.sqrt(SqrEuclideanDistance(a, b));
         }
     }
-}
