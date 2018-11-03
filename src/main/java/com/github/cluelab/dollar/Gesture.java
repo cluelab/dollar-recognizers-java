@@ -89,8 +89,32 @@ package com.github.cluelab.dollar;
          * Constructs a gesture from an array of points
          *
          * @param points
+         * @param gestureName
          */
         public Gesture(Point[] points, String gestureName)
+        {
+            this(points, gestureName, true);
+        }
+
+        /**
+         * Constructs a gesture from an array of points
+         *
+         * @param points
+         */
+        public Gesture(Point[] points)
+        {
+            this(points, "", true);
+        }
+
+
+        /**
+         * Constructs a gesture from an array of points
+         *
+         * @param points
+         * @param gestureName
+         * @param constructLUT
+         */
+        public Gesture(Point[] points, String gestureName, boolean constructLUT)
         {
             this.Name = gestureName;
             
@@ -99,19 +123,23 @@ package com.github.cluelab.dollar;
             this.Points = TranslateTo(Points, Centroid(Points));
             this.Points = Resample(Points, SAMPLING_RESOLUTION);
             
-            // constructs a lookup table for fast lower bounding (used by $Q)
-            this.TransformCoordinatesToIntegers();
-            this.ConstructLUT();
+            if (constructLUT)
+            {
+	            // constructs a lookup table for fast lower bounding (used by $Q)
+	            this.TransformCoordinatesToIntegers();
+	            this.ConstructLUT();
+            }
         }
-        
+
         /**
          * Constructs a gesture from an array of points
          *
          * @param points
+         * @param constructLUT
          */
-        public Gesture(Point[] points)
+        public Gesture(Point[] points, boolean constructLUT)
         {
-            this(points, "");
+            this(points, "", constructLUT);
         }
 
         //region gesture pre-processing steps: scale normalization, translation to origin, and resampling
