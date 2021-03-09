@@ -99,6 +99,14 @@ package com.github.cluelab.dollar;
         }
 
         /**
+         * Compare two gestures.
+         */
+        public static float GreedyCloudMatch(Gesture gesture1, Gesture gesture2)
+        {
+            return GreedyCloudMatch(gesture1.Points, gesture2.Points);
+        }
+
+        /**
          * Implements greedy search for a minimum-distance matching between two point clouds
          *
          * @param points1
