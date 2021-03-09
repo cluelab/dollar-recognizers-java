@@ -25,7 +25,7 @@ You can use snapshot builds through [JitPack](https://jitpack.io):
 2. Add the dependency
 ```gradle
 	dependencies {
-		implementation 'com.github.cluelab:dollar-recognizers-java:7a99d8b58c'
+		implementation 'com.github.cluelab:dollar-recognizers-java:0b48f62a15'
 	}
 ```
 
